@@ -1,228 +1,294 @@
-import './styles/App.css';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import React from 'react';
-import { Bubble } from '@ant-design/x';
-import { Flex, Switch } from 'antd';
-import { Button, Space, theme } from 'antd';
-import { Typography } from 'antd';
-import markdownit from 'markdown-it';
-import { CopyOutlined, SyncOutlined, UserOutlined } from '@ant-design/icons';
-// const socket = io('http://localhost:8000');
-import { Conversations } from '@ant-design/x';
-// import { LoadingOutlined, TagsOutlined } from '@ant-design/icons';
-// import { ThoughtChain, useXAgent } from '@ant-design/x';
+import { Layout, Menu } from 'antd';
+import {
+  HomeOutlined,
+  InfoCircleOutlined,
+  RobotOutlined,
+  WechatOutlined,
+  SettingOutlined,
+  LogoutOutlined
+} from '@ant-design/icons';
+import AITest from './components/test/AITest';
+import AIConvTest from './components/test/AIConvTest';
+import ConvMTest from './components/test/ConvMTest';
+import SendTest from './components/test/SendTest';
+import WindowTest from './components/test/WindowTest';
+import WindowTestDB from './components/test/WindowTestDB';
+import AdminPanel from './components/admin/AdminPanel';
+import Login from './components/auth/Login';
+import PrivateRoute from './components/auth/PrivateRoute';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Home from './components/Home';
+import About from './components/About';
+import { NavbarProvider } from './context/NavbarContext';
 
+const { Header, Content } = Layout;
 
-const items = Array.from({
-  length: 4,
-}).map((_, index) => ({
-  key: `item${index + 1}`,
-  label: `Conversation Item ${index + 1}`,
-  disabled: index === 3,
-}));
+function TestAI() {
+  return <AITest />;
+}
 
-const md = markdownit({
-  html: true,
-  breaks: true,
-});
+function TestAIConv() {
+  return <AIConvTest />;
+}
 
-const roles = {
-  ai: {
-    header: 'Ant Design X',
-    placement: 'start',
-    avatar: {
-      icon: <UserOutlined />,
-      style: {
-        background: '#fde3cf',
-      },
-    },
-    typing: {
-      step: 5,
-      interval: 20,
-    },
-    style: {
-      maxWidth: 600,
-    },
-  },
-  user: {
-    placement: 'end',
-    avatar: {
-      icon: <UserOutlined />,
-      style: {
-        background: '#87d068',
-      },
-    },
-  },
-};
+function TestSend() {
+  return <SendTest />;
+}
 
-const mdtext = `
-> Render as markdown content to show rich text!
+function TestConvM() {
+  return <ConvMTest />;
+}
 
-Link: [Ant Design X](https://x.ant.design)
-`.trim();
+function TestWin() {
+  return <WindowTest />;
+}
 
-const renderMarkdown = (content) => (
-  <Typography>
-    {/* biome-ignore lint/security/noDangerouslySetInnerHtml: used in demo */}
-    <div
-      dangerouslySetInnerHTML={{
-        __html: md.render(content),
-      }}
-    />
-  </Typography>
-);
+function TestWinDB() {
+  const userId = 'test_user_1';
+  return <WindowTestDB userId={userId} />;
+}
 
-const fooAvatar = {
-  color: '#f56a00',
-  backgroundColor: '#fde3cf',
-};
-const barAvatar = {
-  color: '#fff',
-  backgroundColor: '#87d068',
-};
-const hideAvatar = {
-  visibility: 'hidden',
-};
-const text = 'Ant Design X love you! ';
-
-function App() {
-  const { token } = theme.useToken();
-  const [loading, setLoading] = React.useState(true);
-  const [repeat, setRepeat] = React.useState(1);
-  const [renderKey, setRenderKey] = React.useState(0);
-  const [count, setCount] = React.useState(3);
-  const listRef = React.useRef(null);
-
-
-  // Customize the style of the container
-  const style = {
-    width: 256,
-    background: token.colorBgContainer,
-    borderRadius: token.borderRadius,
-  };
+function Chat() {
+  const { user } = useAuth();
+  const userId = user?.id || user?._id;
   
-  React.useEffect(() => {
-    const id = setTimeout(() => {
-      setRenderKey((prev) => prev + 1);
-    }, mdtext.length * 100 + 2000);
-    return () => {
-      clearTimeout(id);
-    };
-  }, [renderKey]);
+  if (!userId) {
+    console.error('No valid user ID found:', user);
+    return <div>Error: Unable to load chat. Missing user ID.</div>;
+  }
+
+  return <WindowTestDB userId={userId} />;
+}
+
+function Admin() {
+  return <AdminPanel />;
+}
+
+function Navigation() {
+  const { isAuthenticated, logout, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // 左侧菜单项
+  const leftMenuItems = [
+    {
+      key: '/',
+      icon: <HomeOutlined />,
+      label: '首页'
+    },
+    {
+      key: '/about',
+      icon: <InfoCircleOutlined />,
+      label: '关于'
+    }
+  ];
+
+  // 认证后的菜单项（除了退出登录）
+  const authenticatedItems = [
+    {
+      key: 'ai',
+      icon: <RobotOutlined />,
+      label: 'AI测试',
+      children: [
+        {
+          key: '/test_ai',
+          label: '基础AI测试'
+        },
+        {
+          key: '/ai_conv_test',
+          label: 'AI对话测试'
+        },
+        {
+          key: '/conv_m_test',
+          label: '会话管理测试'
+        },
+        {
+          key: '/send_test',
+          label: '消息发送测试'
+        },
+        {
+          key: '/win_test',
+          label: '窗口测试'
+        },
+        {
+          key: '/win_test_db',
+          label: '数据库窗口测试'
+        }
+      ]
+    },
+    {
+      key: '/chat',
+      icon: <WechatOutlined />,
+      label: '聊天'
+    }
+  ];
+
+  // 右侧菜单项（登录/退出登录）
+  const rightMenuItems = [];
+
+  if (isAuthenticated()) {
+    // 添加认证后的菜单项到左侧
+    leftMenuItems.push(...authenticatedItems);
+    
+    // 添加管理员菜单到左侧
+    if (isAdmin()) {
+      leftMenuItems.push({
+        key: '/admin',
+        icon: <SettingOutlined />,
+        label: '管理员'
+      });
+    }
+
+    // 添加退出登录到右侧
+    rightMenuItems.push({
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: '退出登录',
+      danger: true
+    });
+  } else {
+    // 添加登录到右侧
+    rightMenuItems.push({
+      key: '/login',
+      icon: <LogoutOutlined />,
+      label: '登录'
+    });
+  }
+
+  const handleMenuClick = ({ key }) => {
+    if (key === 'logout') {
+      logout();
+      navigate('/', { replace: true });
+    } else {
+      navigate(key);
+    }
+  };
 
   return (
-    <Flex gap="middle" vertical>
-      <Flex
-        gap="small"
-        style={{
-          alignSelf: 'flex-end',
+    <Header style={{ 
+      padding: 0, 
+      height: '48px',
+      lineHeight: '48px',
+      position: 'fixed',
+      width: '100%',
+      zIndex: 1000,
+      display: 'flex',
+      justifyContent: 'space-between'
+    }}>
+      {/* 左侧菜单 */}
+      <Menu
+        theme="dark"
+        mode="horizontal"
+        selectedKeys={[location.pathname]}
+        items={leftMenuItems}
+        onClick={handleMenuClick}
+        style={{ 
+          height: '48px',
+          lineHeight: '48px',
+          flex: 1
         }}
-      >
-        <Button
-          onClick={() => {
-            setCount((i) => i + 1);
-          }}
-        >
-          Add Bubble
-        </Button>
-
-        <Button
-          onClick={() => {
-            listRef.current?.scrollTo({
-              key: 0,
-              block: 'nearest',
-            });
-          }}
-        >
-          Scroll To First
-        </Button>
-      </Flex>
-    <Bubble
-      placement="start"
-      content="Good morning, how are you?"
-      avatar={{
-        icon: <UserOutlined />,
-        style: fooAvatar,
-      }}
-      header="Ant Design X"
-      footer={
-        <Space size={token.paddingXXS}>
-          <Button color="default" variant="text" size="small" icon={<SyncOutlined />} />
-          <Button color="default" variant="text" size="small" icon={<CopyOutlined />} />
-        </Space>
-      }
-    />
-    <Bubble
-      placement="start"
-      content="What a beautiful day!"
-      styles={{
-        avatar: hideAvatar,
-      }}
-      avatar={{}}
-    />
-    <Bubble
-      placement="end"
-      content="Hi, good morning, I'm fine!"
-      avatar={{
-        icon: <UserOutlined />,
-        style: barAvatar,
-      }}
-    />
-    <Bubble
-      placement="end"
-      loading={loading}
-      content={text.repeat(repeat)}
-      typing={{
-        step: 2,
-        interval: 50,
-      }}
-      styles={{
-        avatar: hideAvatar,
-      }}
-      avatar={{}}
-    />
-    <Bubble
-      typing
-      content={mdtext}
-      messageRender={renderMarkdown}
-      avatar={{
-        icon: <UserOutlined />,
-      }}
-    />
-    <Flex gap="large" wrap>
-      Loading state:
-      <Switch checked={loading} onChange={setLoading} />
-    </Flex>
-    <Button
-        style={{
-          alignSelf: 'flex-end',
-        }}
-        onClick={() => {
-          setRepeat((ori) => (ori < 5 ? ori + 1 : 1));
-        }}
-      >
-        Repeat {repeat} Times
-      </Button>
-      <Bubble.List
-        ref={listRef}
-        style={{
-          maxHeight: 300,
-        }}
-        roles={roles}
-        items={Array.from({
-          length: count,
-        }).map((_, i) => {
-          const isAI = !!(i % 2);
-          const content = isAI ? 'Mock AI content. '.repeat(20) : 'Mock user content.';
-          return {
-            key: i,
-            role: isAI ? 'ai' : 'user',
-            content,
-          };
-        })}
       />
-    <Conversations items={items} defaultActiveKey="item1" style={style} />;
-  </Flex>
+      
+      {/* 右侧菜单 */}
+      <Menu
+        theme="dark"
+        mode="horizontal"
+        selectedKeys={[location.pathname]}
+        items={rightMenuItems}
+        onClick={handleMenuClick}
+        style={{ 
+          height: '48px',
+          lineHeight: '48px',
+          minWidth: '120px'
+        }}
+      />
+    </Header>
   );
 }
-export default App;
 
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <NavbarProvider>
+          <Layout style={{ 
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <Navigation />
+            <Content style={{ 
+              padding: '20px',
+              marginTop: '48px',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              background: '#fff',
+              borderRadius: '4px'
+            }}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/login" element={<Login />} />
+                
+                <Route path="/chat" element={
+                  <PrivateRoute>
+                    <Chat />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/admin" element={
+                  <PrivateRoute>
+                    <Admin />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/test_ai" element={
+                  <PrivateRoute>
+                    <TestAI />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/ai_conv_test" element={
+                  <PrivateRoute>
+                    <TestAIConv />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/conv_m_test" element={
+                  <PrivateRoute>
+                    <TestConvM />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/send_test" element={
+                  <PrivateRoute>
+                    <TestSend />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/win_test" element={
+                  <PrivateRoute>
+                    <TestWin />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/win_test_db" element={
+                  <PrivateRoute>
+                    <TestWinDB />
+                  </PrivateRoute>
+                } />
+
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Content>
+          </Layout>
+        </NavbarProvider>
+      </AuthProvider>
+    </Router>
+  );
+}
+
+export default App;
