@@ -17,4 +17,19 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-module.exports = authenticateToken; 
+const isAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: '未提供认证令牌' });
+  }
+
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: '需要管理员权限' });
+  }
+
+  next();
+};
+
+module.exports = {
+  authenticateToken,
+  isAdmin
+}; 

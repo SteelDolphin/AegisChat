@@ -2,12 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, Input, Button, List, message, Select, Spin } from 'antd';
 import { SendOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { aiService } from '../../services/aiService';
+<<<<<<< HEAD
 import { conversationService } from '../../services/conversationService';
 import { useAuth } from '../../context/AuthContext';
 import { useNavbar } from '../../context/NavbarContext';
 import { useNavigate } from 'react-router-dom';
 
 const ChatWindow = ( ) => {
+=======
+import { conversationApi } from '../../services/api';
+
+const ChatWindow = ({ userId }) => {
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,6 +22,7 @@ const ChatWindow = ( ) => {
   const [loadingConversations, setLoadingConversations] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const messagesEndRef = useRef(null);
+<<<<<<< HEAD
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { setIsNavbarVisible } = useNavbar();
@@ -37,11 +44,40 @@ const ChatWindow = ( ) => {
 
     fetchConversations();
   }, [user]);
+=======
+
+  useEffect(() => {
+    if (userId) {
+      loadConversations();
+    }
+  }, [userId]);
+
+  const loadConversations = async () => {
+    try {
+      setLoadingConversations(true);
+      const data = await conversationApi.getUserConversations(userId);
+      setConversations(data);
+      
+      // If there are conversations but none is selected, select the first one
+      if (data.length > 0 && !currentConversation) {
+        await loadConversation(data[0]._id);
+      }
+    } catch (error) {
+      message.error(error.message);
+    } finally {
+      setLoadingConversations(false);
+    }
+  };
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
 
   const loadConversation = async (conversationId) => {
     try {
       setLoadingMessages(true);
+<<<<<<< HEAD
       const conversation = await conversationService.getConversation(conversationId);
+=======
+      const conversation = await conversationApi.getConversation(conversationId);
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
       setCurrentConversation(conversation);
       setMessages(conversation.messages.map(msg => ({
         id: msg._id,
@@ -57,6 +93,7 @@ const ChatWindow = ( ) => {
   };
 
   const createNewConversation = async () => {
+<<<<<<< HEAD
     if (!isAuthenticated()) {
       navigate('/login');
       return;
@@ -74,6 +111,17 @@ const ChatWindow = ( ) => {
       message.success('新会话创建成功');
     } catch (error) {
       console.error('创建对话失败:', error);
+=======
+    try {
+      setLoadingConversations(true);
+      const title = `新会话 ${new Date().toLocaleString()}`;
+      const conversation = await conversationApi.createConversation(userId, title);
+      setConversations(prev => [conversation, ...prev]);
+      setCurrentConversation(conversation);
+      setMessages([]);
+      message.success('新会话创建成功');
+    } catch (error) {
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
       message.error(error.message);
     } finally {
       setLoadingConversations(false);
@@ -82,8 +130,12 @@ const ChatWindow = ( ) => {
 
   const deleteConversation = async (conversationId) => {
     try {
+<<<<<<< HEAD
       // 使用 conversationService 而不是 conversationApi
       await conversationService.deleteConversation(conversationId);
+=======
+      await conversationApi.deleteConversation(conversationId);
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
       setConversations(prev => prev.filter(conv => conv._id !== conversationId));
       if (currentConversation?._id === conversationId) {
         setCurrentConversation(null);
@@ -103,6 +155,7 @@ const ChatWindow = ( ) => {
     scrollToBottom();
   }, [messages]);
 
+<<<<<<< HEAD
   const handleScroll = (e) => {
     if (scrollTimeout.current) {
       clearTimeout(scrollTimeout.current);
@@ -145,6 +198,8 @@ const ChatWindow = ( ) => {
     };
   }, []);
 
+=======
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
   const handleSend = async () => {
     if (!inputText.trim() || !currentConversation) return;
 
@@ -160,8 +215,13 @@ const ChatWindow = ( ) => {
     setLoading(true);
 
     try {
+<<<<<<< HEAD
       // 使用 conversationService 而不是 conversationApi
       await conversationService.addMessage(currentConversation._id, 'user', inputText);
+=======
+      // Save user message to database
+      await conversationApi.addMessage(currentConversation._id, 'user', inputText);
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
 
       let aiResponse = '';
       await aiService.generateResponse(inputText, async (content) => {
@@ -185,8 +245,13 @@ const ChatWindow = ( ) => {
         });
       });
 
+<<<<<<< HEAD
       // 使用 conversationService 而不是 conversationApi
       await conversationService.addMessage(currentConversation._id, 'assistant', aiResponse);
+=======
+      // Save AI response to database
+      await conversationApi.addMessage(currentConversation._id, 'assistant', aiResponse);
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
     } catch (error) {
       message.error(error.message);
     } finally {
@@ -195,6 +260,7 @@ const ChatWindow = ( ) => {
   };
 
   return (
+<<<<<<< HEAD
     <Card style={{ 
       height: 'calc(100vh - 48px)', // 视口高度减去导航栏高度
       display: 'flex', 
@@ -213,6 +279,10 @@ const ChatWindow = ( ) => {
         gap: 8,
         flexShrink: 0
       }}>
+=======
+    <Card style={{ height: '80vh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
         <Select
           style={{ width: 200 }}
           placeholder="选择会话"
@@ -247,6 +317,7 @@ const ChatWindow = ( ) => {
         )}
       </div>
 
+<<<<<<< HEAD
       <List
         ref={listRef}
         style={{ 
@@ -316,16 +387,65 @@ const ChatWindow = ( ) => {
         gap: 8,
         flexShrink: 0
       }}>
+=======
+      <div style={{ flex: 1, overflow: 'auto', marginBottom: 16, position: 'relative' }}>
+        {loadingMessages ? (
+          <div style={{ 
+            position: 'absolute', 
+            top: '50%', 
+            left: '50%', 
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center'
+          }}>
+            <Spin />
+            <div style={{ marginTop: 8, color: 'rgba(0, 0, 0, 0.45)' }}>
+              加载消息中...
+            </div>
+          </div>
+        ) : (
+          <List
+            itemLayout="horizontal"
+            dataSource={messages}
+            renderItem={item => (
+              <List.Item style={{ 
+                justifyContent: item.type === 'user' ? 'flex-end' : 'flex-start'
+              }}>
+                <div style={{
+                  maxWidth: '70%',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  backgroundColor: item.type === 'user' ? '#1890ff' : '#f0f2f5',
+                  color: item.type === 'user' ? 'white' : 'rgba(0, 0, 0, 0.85)',
+                }}>
+                  <div style={{ marginBottom: 4 }}>
+                    {item.type === 'user' ? '你' : 'AI助手'}
+                  </div>
+                  <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {item.content}
+                  </div>
+                </div>
+              </List.Item>
+            )}
+          />
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      
+      <div style={{ display: 'flex', gap: 8 }}>
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
         <Input
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onPressEnter={handleSend}
           placeholder="输入消息..."
           disabled={loading || !currentConversation || loadingMessages}
+<<<<<<< HEAD
           style={{
             borderRadius: '4px',
             padding: '8px 12px'
           }}
+=======
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
         />
         <Button
           type="primary"

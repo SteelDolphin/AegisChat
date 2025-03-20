@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const conversationController = require('../controllers/conversationController');
-const authenticateToken = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 
 // 所有路由都需要认证
 router.use(authenticateToken);

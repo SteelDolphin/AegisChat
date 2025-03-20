@@ -19,9 +19,16 @@ const UserManagement = () => {
     try {
       setLoading(true);
       const data = await userService.getAllUsers();
-      setUsers(data);
+      if (Array.isArray(data)) {
+        setUsers(data);
+      } else {
+        message.error('获取到的用户数据格式不正确');
+        setUsers([]);
+      }
     } catch (error) {
-      message.error(error.message);
+      console.error('获取用户列表失败:', error);
+      message.error(error.message || '获取用户列表失败');
+      setUsers([]);
     } finally {
       setLoading(false);
     }

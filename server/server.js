@@ -5,6 +5,7 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const conversationRoutes = require('./routes/conversationRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -12,12 +13,16 @@ const app = express();
 connectDB();
 
 // 中间件
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 // 路由
 app.use('/api/auth', authRoutes);
 app.use('/api/conversations', conversationRoutes);
+app.use('/api/users', userRoutes);
 
 // 错误处理中间件
 app.use((err, req, res, next) => {

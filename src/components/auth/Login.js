@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { Radio, Card } from 'antd';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loginType, setLoginType] = useState('user'); // 'user' or 'admin'
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,8 +22,9 @@ const Login = () => {
     try {
       const success = await login(username, password);
       if (success) {
-        // 使用 replace 而不是 push，这样用户点击后退按钮时不会回到登录页
-        navigate(from, { replace: true });
+        // 根据登录类型重定向到不同页面
+        const redirectPath = loginType === 'admin' ? '/admin' : from;
+        navigate(redirectPath, { replace: true });
       } else {
         setError('用户名或密码错误');
       }
@@ -38,15 +41,26 @@ const Login = () => {
       minHeight: '100vh',
       backgroundColor: '#f5f5f5'
     }}>
-      <div style={{
-        padding: '2rem',
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        width: '100%',
-        maxWidth: '400px'
-      }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>用户登录</h2>
+      <Card
+        title={
+          <div style={{ textAlign: 'center' }}>
+            <h2 style={{ margin: 0 }}>系统登录</h2>
+            <Radio.Group 
+              value={loginType} 
+              onChange={(e) => setLoginType(e.target.value)}
+              style={{ marginTop: '1rem' }}
+            >
+              <Radio.Button value="user">普通用户</Radio.Button>
+              <Radio.Button value="admin">管理员</Radio.Button>
+            </Radio.Group>
+          </div>
+        }
+        style={{
+          width: '100%',
+          maxWidth: '400px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}
+      >
         {error && (
           <div style={{
             color: 'red',
@@ -60,7 +74,8 @@ const Login = () => {
           <div style={{ marginBottom: '1rem' }}>
             <label style={{
               display: 'block',
-              marginBottom: '0.5rem'
+              marginBottom: '0.5rem',
+              fontWeight: 'bold'
             }}>
               用户名
             </label>
@@ -80,7 +95,8 @@ const Login = () => {
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{
               display: 'block',
-              marginBottom: '0.5rem'
+              marginBottom: '0.5rem',
+              fontWeight: 'bold'
             }}>
               密码
             </label>
@@ -102,17 +118,24 @@ const Login = () => {
             style={{
               width: '100%',
               padding: '0.75rem',
-              backgroundColor: '#1890ff',
+              backgroundColor: loginType === 'admin' ? '#ff4d4f' : '#1890ff',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'background-color 0.3s'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = loginType === 'admin' ? '#ff7875' : '#40a9ff';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = loginType === 'admin' ? '#ff4d4f' : '#1890ff';
             }}
           >
-            登录
+            {loginType === 'admin' ? '管理员登录' : '用户登录'}
           </button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 };

@@ -18,6 +18,7 @@ import WindowTestDB from './components/test/WindowTestDB';
 import AdminPanel from './components/admin/AdminPanel';
 import Login from './components/auth/Login';
 import PrivateRoute from './components/auth/PrivateRoute';
+import AdminRoute from './components/auth/AdminRoute';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Home from './components/Home';
 import About from './components/About';
@@ -67,7 +68,7 @@ function Admin() {
 }
 
 function Navigation() {
-  const { isAuthenticated, logout, isAdmin } = useAuth();
+  const { isAuthenticated, logout, isAdmin, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -87,6 +88,15 @@ function Navigation() {
 
   // 认证后的菜单项（除了退出登录）
   const authenticatedItems = [
+    {
+      key: '/chat',
+      icon: <WechatOutlined />,
+      label: '聊天'
+    }
+  ];
+
+  // 管理员菜单项
+  const adminItems = [
     {
       key: 'ai',
       icon: <RobotOutlined />,
@@ -119,9 +129,9 @@ function Navigation() {
       ]
     },
     {
-      key: '/chat',
-      icon: <WechatOutlined />,
-      label: '聊天'
+      key: '/admin',
+      icon: <SettingOutlined />,
+      label: '管理员'
     }
   ];
 
@@ -132,22 +142,49 @@ function Navigation() {
     // 添加认证后的菜单项到左侧
     leftMenuItems.push(...authenticatedItems);
     
-    // 添加管理员菜单到左侧
+    // 如果是管理员，添加管理员菜单
     if (isAdmin()) {
-      leftMenuItems.push({
-        key: '/admin',
-        icon: <SettingOutlined />,
-        label: '管理员'
-      });
+      leftMenuItems.push(...adminItems);
     }
 
-    // 添加退出登录到右侧
-    rightMenuItems.push({
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: '退出登录',
-      danger: true
-    });
+    // 添加用户名和退出登录到右侧
+    rightMenuItems.push(
+      {
+        key: 'username',
+        label: (
+          <span style={{ 
+            color: '#fff',
+            marginRight: '16px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            height: '48px',
+            lineHeight: '48px'
+          }}>
+            <span style={{ 
+              backgroundColor: isAdmin() ? '#ff4d4f' : '#1890ff',
+              padding: '0 8px',
+              height: '20px',
+              lineHeight: '20px',
+              borderRadius: '10px',
+              fontSize: '12px',
+              marginRight: '8px',
+              display: 'inline-flex',
+              alignItems: 'center'
+            }}>
+              {isAdmin() ? '管理员' : '用户'}
+            </span>
+            {user?.username}
+          </span>
+        ),
+        disabled: true
+      },
+      {
+        key: 'logout',
+        icon: <LogoutOutlined />,
+        label: '退出登录',
+        danger: true
+      }
+    );
   } else {
     // 添加登录到右侧
     rightMenuItems.push({
@@ -201,7 +238,9 @@ function Navigation() {
         style={{ 
           height: '48px',
           lineHeight: '48px',
-          minWidth: '120px'
+          minWidth: '200px',
+          display: 'flex',
+          justifyContent: 'flex-end'
         }}
       />
     </Header>
@@ -240,45 +279,45 @@ function App() {
                 } />
                 
                 <Route path="/admin" element={
-                  <PrivateRoute>
+                  <AdminRoute>
                     <Admin />
-                  </PrivateRoute>
+                  </AdminRoute>
                 } />
                 
                 <Route path="/test_ai" element={
-                  <PrivateRoute>
+                  <AdminRoute>
                     <TestAI />
-                  </PrivateRoute>
+                  </AdminRoute>
                 } />
                 
                 <Route path="/ai_conv_test" element={
-                  <PrivateRoute>
+                  <AdminRoute>
                     <TestAIConv />
-                  </PrivateRoute>
+                  </AdminRoute>
                 } />
                 
                 <Route path="/conv_m_test" element={
-                  <PrivateRoute>
+                  <AdminRoute>
                     <TestConvM />
-                  </PrivateRoute>
+                  </AdminRoute>
                 } />
                 
                 <Route path="/send_test" element={
-                  <PrivateRoute>
+                  <AdminRoute>
                     <TestSend />
-                  </PrivateRoute>
+                  </AdminRoute>
                 } />
                 
                 <Route path="/win_test" element={
-                  <PrivateRoute>
+                  <AdminRoute>
                     <TestWin />
-                  </PrivateRoute>
+                  </AdminRoute>
                 } />
                 
                 <Route path="/win_test_db" element={
-                  <PrivateRoute>
+                  <AdminRoute>
                     <TestWinDB />
-                  </PrivateRoute>
+                  </AdminRoute>
                 } />
 
                 <Route path="*" element={<Navigate to="/" replace />} />
