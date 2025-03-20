@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { message } from 'antd';
 import { authService } from '../services/authService';
@@ -13,10 +14,46 @@ export const AuthProvider = ({ children }) => {
       try {
         const userData = await authService.getCurrentUser();
         if (userData) {
+=======
+import React, { createContext, useState, useEffect } from 'react';
+import { message } from 'antd';
+import { authService } from '../services/authService';
+
+export const AuthContext = createContext(null);
+
+// 开发模式下的模拟用户数据
+const DEV_MODE = process.env.REACT_APP_DEV_MODE === 'true';
+const mockUser = {
+  id: 1,
+  username: 'dev_user',
+  role: 'admin'
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(DEV_MODE ? mockUser : null);
+  const [loading, setLoading] = useState(!DEV_MODE);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      // 如果是开发模式，直接返回，不进行认证
+      if (DEV_MODE) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const userData = await authService.getCurrentUser();
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
           setUser(userData);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
+<<<<<<< HEAD
+=======
+        localStorage.removeItem('token');
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
       } finally {
         setLoading(false);
       }
@@ -25,6 +62,7 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+<<<<<<< HEAD
   const login = async (username, password) => {
     setLoading(true);
     try {
@@ -122,4 +160,23 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+=======
+  const logout = () => {
+    if (!DEV_MODE) {
+      localStorage.removeItem('token');
+    }
+    setUser(null);
+    message.success('已退出登录');
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+>>>>>>> b346fdf872ae23e7015f8e75e6f7669ffcb0e687
 }; 
