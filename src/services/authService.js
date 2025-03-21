@@ -1,11 +1,11 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 export const authService = {
   async login(username, password) {
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const authService = {
 
   async register(username, password) {
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ export const authService = {
     }
 
     try {
-      const response = await fetch(`${API_URL}/auth/me`, {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -100,7 +100,7 @@ export const authService = {
       const token = localStorage.getItem('token');
       if (token) {
         // 尝试调用后端的登出接口
-        await fetch(`${API_URL}/auth/logout`, {
+        await fetch(`${API_BASE_URL}/auth/logout`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
