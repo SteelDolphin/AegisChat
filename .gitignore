@@ -13,7 +13,8 @@
 # testing
 /coverage
 /damos
-
+/server/coverage
+/server/test
 # production
 /build
 

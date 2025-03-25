@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authRoutes');
 const conversationRoutes = require('./routes/conversationRoutes');
 const userRoutes = require('./routes/userRoutes');
 const healthRoutes = require('./routes/healthRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const ttsRoutes = require('./routes/ttsRoutes');
 
 const app = express();
 
@@ -28,8 +30,10 @@ app.use(API_ROUTES.HEALTH, healthRoutes);
 app.use(API_ROUTES.AUTH, authRoutes);
 app.use(API_ROUTES.CONVERSATIONS, conversationRoutes);
 app.use(API_ROUTES.USERS, userRoutes);
+app.use(API_ROUTES.CHAT, chatRoutes);
+app.use(API_ROUTES.TTS, ttsRoutes);
 
-// 错误处理中间件
+// 错误处理中间件 
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: '服务器内部错误' });
