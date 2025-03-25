@@ -1,36 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Flex } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
 import { Bubble, Sender, useXAgent, useXChat } from '@ant-design/x';
 import { aiService } from '../../services/aiService';
-
-const roles = {
-  ai: {
-    placement: 'start',
-    avatar: {
-      icon: <UserOutlined />,
-      style: {
-        background: '#fde3cf',
-      },
-    },
-    typing: {
-      step: 5,
-      interval: 20,
-    },
-    style: {
-      maxWidth: 600,
-    },
-  },
-  local: {
-    placement: 'end',
-    avatar: {
-      icon: <UserOutlined />,
-      style: {
-        background: '#87d068',
-      },
-    },
-  },
-};
+import { roles } from '../../config/chatRoles';
 
 const SendTest = () => {
   const [content, setContent] = useState('');

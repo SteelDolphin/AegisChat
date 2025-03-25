@@ -29,7 +29,9 @@ const API_ROUTES = {
   AUTH: '/api/auth',
   CONVERSATIONS: '/api/conversations',
   USERS: '/api/users',
-  HEALTH: '/api/health'
+  HEALTH: '/api/health',
+  CHAT: '/api/chat',
+  TTS: '/api/tts'
 };
 
 // 用户角色

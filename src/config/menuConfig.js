@@ -60,6 +60,14 @@ import {
         {
           key: '/win_test_db',
           label: '数据库窗口测试'
+        },
+        {
+          key: '/streaming_chat_test',
+          label: '流式聊天测试'
+        },
+        {
+          key: '/tts_test',
+          label: 'TTS测试'
         }
       ]
     },

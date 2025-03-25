@@ -17,7 +17,8 @@ import ConvMTest from '../test/ConvMTest';
 import SendTest from '../test/SendTest';
 import WindowTest from '../test/WindowTest';
 import WindowTestDB from '../test/WindowTestDB';
-
+import StreamingChatTest from '../test/StreamingChatTest';
+import TTSTest from '../test/TTSTest';
 function AppRoutes() {
   return (
     <Routes>
@@ -74,6 +75,18 @@ function AppRoutes() {
       <Route path="/win_test_db" element={
         <AdminRoute>
           <WindowTestDB userId="test_user_1" />
+        </AdminRoute>
+      } />
+
+      <Route path="/streaming_chat_test" element={
+        <AdminRoute>
+          <StreamingChatTest />
+        </AdminRoute>
+      } />
+
+      <Route path="/tts_test" element={
+        <AdminRoute>
+          <TTSTest />
         </AdminRoute>
       } />
 
