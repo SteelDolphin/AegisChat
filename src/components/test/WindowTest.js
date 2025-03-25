@@ -1,36 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Flex, Button, Badge } from 'antd';
-import { UserOutlined, PlusOutlined, PaperClipOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import { Bubble, Sender, useXAgent, useXChat, Conversations, Attachments } from '@ant-design/x';
+import { PlusOutlined, PaperClipOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import { aiService } from '../../services/aiService';
-
-const roles = {
-  ai: {
-    placement: 'start',
-    avatar: {
-      icon: <UserOutlined />,
-      style: {
-        background: '#fde3cf',
-      },
-    },
-    typing: {
-      step: 5,
-      interval: 20,
-    },
-    style: {
-      maxWidth: 600,
-    },
-  },
-  local: {
-    placement: 'end',
-    avatar: {
-      icon: <UserOutlined />,
-      style: {
-        background: '#87d068',
-      },
-    },
-  },
-};
+import { roles } from '../../config/chatRoles';
 
 // 默认对话列表
 const defaultConversationsItems = [

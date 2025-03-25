@@ -20,9 +20,6 @@ const SERVER_CONFIG = {
 const CORS_CONFIG = {
   ORIGIN: [
     process.env.CLIENT_URL || 'http://localhost:3000',
-    'http://localhost:8080',
-    'http://10.222.148.202:3000',
-    'http://10.222.148.202:8080'
   ],
   CREDENTIALS: true
 };
@@ -31,7 +28,8 @@ const CORS_CONFIG = {
 const API_ROUTES = {
   AUTH: '/api/auth',
   CONVERSATIONS: '/api/conversations',
-  USERS: '/api/users'
+  USERS: '/api/users',
+  HEALTH: '/api/health'
 };
 
 // 用户角色

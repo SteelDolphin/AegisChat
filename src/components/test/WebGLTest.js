@@ -1,6 +1,6 @@
 import React, { Suspense, useState, useEffect, useRef } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, useFBX, Environment, useGLTF, Stats, Html } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Environment, useGLTF, Stats } from '@react-three/drei';
 import { Tabs, Button, Space, message, Slider } from 'antd';
 import * as THREE from 'three';
 
@@ -16,7 +16,6 @@ function Box() {
 function BeeModel({ onActionsLoaded, speed }) {
     const { scene, animations } = useGLTF('/bee2.glb');
     const mixerRef = useRef();
-    const [actions, setActions] = useState({});
     const modelRef = useRef();
 
     useEffect(() => {
@@ -42,7 +41,6 @@ function BeeModel({ onActionsLoaded, speed }) {
                 }
             });
 
-            setActions(newActions);
             onActionsLoaded(newActions);
 
             // 默认播放第一个动画
@@ -53,16 +51,17 @@ function BeeModel({ onActionsLoaded, speed }) {
                 console.log('Playing first bee animation:', firstAction.getClip().name);
             }
         }
-    }, [animations, onActionsLoaded, speed]);
+    }, [animations, onActionsLoaded, speed, scene]);
 
     // 更新动画速度
     useEffect(() => {
         if (mixerRef.current) {
-            Object.values(actions).forEach(action => {
+            const currentActions = mixerRef.current._actions;
+            Object.values(currentActions).forEach(action => {
                 action.setEffectiveTimeScale(speed);
             });
         }
-    }, [speed, actions]);
+    }, [speed]);
 
     // 使用 useFrame 更新动画
     useFrame((state, delta) => {
@@ -84,7 +83,6 @@ function BeeModel({ onActionsLoaded, speed }) {
 function AnimatedDefaultModel({ onActionsLoaded }) {
     const { scene, animations } = useGLTF('/defult.glb');
     const mixerRef = useRef();
-    const [actions, setActions] = useState({});
     const modelRef = useRef();
 
     useEffect(() => {
@@ -110,7 +108,6 @@ function AnimatedDefaultModel({ onActionsLoaded }) {
                 }
             });
 
-            setActions(newActions);
             onActionsLoaded(newActions);
 
             // 默认播放第一段动画
@@ -352,32 +349,5 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
-
-// 添加一个组件来获取模型
-function ModelModelAccess({ children }) {
-    const [model, setModel] = useState(null);
-    const { scene } = useThree();
-    
-    useEffect(() => {
-        // 找到场景中的模型
-        if (scene) {
-            let foundModel = null;
-            scene.traverse((object) => {
-                if (!foundModel && (object.type === 'Group' || object.type === 'Object3D')) {
-                    // 只关注有意义的组，通常是具有多个子对象的
-                    if (object.children && object.children.length > 0) {
-                        foundModel = object;
-                    }
-                }
-            });
-            
-            if (foundModel) {
-                setModel(foundModel);
-            }
-        }
-    }, [scene]);
-    
-    return children(model);
-}
 
 export default WebGLTest;
